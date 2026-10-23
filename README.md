@@ -33,11 +33,11 @@ The `trash` class holds only **5.4 %** of the images, about a quarter of the siz
 | A · WasteNet (custom CNN, scratch) | 0.82 | 0.80 [0.75, 0.84] | 0.49 | 0.90 | 0.63 | 3.4 M | 38.9 ms | 5.8 min |
 | B · ResNet-50 (ImageNet, fine-tuned) | 0.97 | 0.97 [0.94, 0.98] | 0.95 | 0.95 | 0.95 | 23.5 M | 45.8 ms | 3.6 min |
 | **C · EfficientNet-B0 (ImageNet, fine-tuned), selected** | **0.95** | **0.95 [0.92, 0.97]** | **0.90** | **0.95** | **0.93** | **4.0 M** | **18.5 ms** | **3.0 min** |
-| C without class weights (ablation) | 0.96 | 0.96 [0.93, 0.98] | 0.95 | 0.95 | 0.95 | 4.0 M | 18.5 ms | 2.7 min |
+| C without class weights (ablation) | 0.96 | 0.95 [0.93, 0.98] | 0.95 | 0.95 | 0.95 | 4.0 M | 18.5 ms | 2.7 min |
 
 <sub>\* one image, batch size 1, 4 CPU threads (proxy for an embedded smart-bin controller). \** NVIDIA RTX 4050 laptop GPU, bf16 mixed precision. The model is chosen on the **validation** set, so the test set stays an unbiased estimate; ResNet-50's slightly higher test score is inside the overlapping confidence intervals.</sub>
 
-**Per-class test F1 of the selected model:** glass 0.96 · paper 0.96 · cardboard 0.96 · plastic 0.93 · metal 0.95 · trash 0.93
+**Per-class test F1 of the selected model:** glass 0.96 · paper 0.96 · cardboard 0.96 · plastic 0.93 · metal 0.94 · trash 0.93
 
 <p align="center">
   <img src="figures/report_fig1_curves_confusion.png" width="92%" alt="Learning curves and test confusion matrix of the selected model">
@@ -58,6 +58,7 @@ The `trash` class holds only **5.4 %** of the images, about a quarter of the siz
 | **Honest evaluation** | Accuracy, balanced accuracy, macro / weighted F1, Cohen's κ, top-2 accuracy, macro ROC-AUC, per-class P / R / F1, confusion matrices, PR curves and **95 % bootstrap confidence intervals** (the test set holds only 20 trash images). |
 | **Explainability** | Misclassified-image gallery with a reason for each error, trash false negatives / positives, confidence analysis, **t-SNE** of learned features and **Grad-CAM** heat maps. |
 | **Deployment view** | Parameters, model size, and GPU / 4-thread CPU latency per image, as a proxy for an embedded smart-bin controller. |
+| **Print-ready figures** | Notebook section 12.4 reloads the saved best weights, verifies that they reproduce the test results exactly, and redraws every key result at A4 print size for the report. |
 
 ## Trash-class analysis
 
@@ -120,8 +121,11 @@ All of them are listed in [`requirements.txt`](requirements.txt).
 ```
 .
 ├── RA2311026050027_PS31.ipynb          # the complete notebook, executed, with all outputs
-├── RA2311026050027_PS31_Report.pdf     # two-page report (CBL Part D format)
-├── report/report.html                  # source of the report (printed to PDF)
+├── RA2311026050027_PS31_Report.pdf     # report (4 pages, CBL Part D section format)
+├── report/
+│   ├── report.html                     # source of the 4-page report (printed to PDF)
+│   ├── report_2page.html               # source of the original 2-page version
+│   └── RA2311026050027_PS31_Report_2page.pdf
 ├── figures/                            # every figure produced by the notebook (PNG)
 ├── results/                            # metrics CSV / JSON, per-epoch histories, the saved split
 ├── requirements.txt
