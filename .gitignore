@@ -1,0 +1,8 @@
+# Python environment and caches
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+
+# Dataset (downloaded by the notebook) and trained weights (re-created by running it)
+data/
+models/

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RA2311026050027_PS31_Report</title>
+<style>
+  @page { size: A4; margin: 2cm; }
+  html { font-family: "Times New Roman", Times, "Liberation Serif", serif; font-size: 11pt; line-height: 1.15; color: #000; }
+  body { margin: 0; }
+  h1 { font-size: 13pt; text-align: center; margin: 0 0 3pt; }
+  .header { text-align: center; border-top: 0.75pt solid #000; border-bottom: 0.75pt solid #000; padding: 2pt 0; margin-bottom: 3pt; }
+  .header a { color: #000; }
+  h2 { font-size: 12pt; font-weight: bold; margin: 4pt 0 1pt; }
+  p { margin: 0 0 2pt; text-align: justify; hyphens: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 10pt; line-height: 1.1; margin: 1pt 0 3pt; }
+  th, td { border: 0.5pt solid #000; padding: 0.8pt 3pt; text-align: center; vertical-align: middle; white-space: nowrap; }
+  th { font-weight: bold; background: #ececec; }
+  td.l, th.l { text-align: left; }
+  .cap { font-size: 10pt; text-align: center; margin: 2pt 0 1pt; }
+  figure { margin: 2pt 0 3pt; text-align: center; break-inside: avoid; }
+  figure img { width: 100%; display: block; }
+  figcaption { font-size: 10pt; margin-top: 1pt; }
+  .foot { font-size: 10pt; border-top: 0.5pt solid #000; padding-top: 2pt; margin-top: 4pt; text-align: justify; }
+</style>
+</head>
+<body>
+
+<h1>PS-31 Waste Segregation at Source: CNN Classification of Dry Waste</h1>
+<div class="header">
+  <b>Name:</b> Karthik.K.S &nbsp;|&nbsp; <b>Register No.:</b> RA2311026050027 &nbsp;|&nbsp; <b>Section:</b> AIML-A &nbsp;|&nbsp; <b>Date:</b> 23-10-2026<br>
+  <b>PS No. and Title:</b> PS-31, Waste Segregation at Source &nbsp;|&nbsp; <b>GitHub:</b> <a href="https://github.com/KS-KARTHIK-05/CBL">https://github.com/KS-KARTHIK-05/CBL</a>
+</div>
+
+<h2>1. Problem and Objective</h2>
+<p>Smart bins and material-recovery facilities must separate dry waste into recyclable streams without manual handling; every mis-sorted item loses recyclable material or contaminates a bale. The task is to classify a photo of a single waste item as glass, paper, cardboard, plastic, metal or trash. Because <i>trash</i> is only 5.4&nbsp;% of the data, success is judged by <b>test macro-F1</b> (all classes weigh equally) and <b>per-class recall and F1, especially for trash</b>, with accuracy reported alongside.</p>
+
+<h2>2. Dataset and Pre-processing</h2>
+<p><b>Source:</b> TrashNet, <i>dataset-resized</i> (github.com/garythung/trashnet), full set of 2,527 RGB images (512&times;384): glass 501, paper 594, cardboard 403, plastic 482, metal 410, trash 137 (imbalance 4.3&nbsp;:&nbsp;1). <b>Audit:</b> MD5 hashing found 3 identical photos filed under two classes (e.g. metal91 = glass115); all 6 copies were removed, leaving <b>2,521 images</b>. 19 near-duplicate pairs (same object shot twice) were kept within one split. <b>Split:</b> stratified, group-aware 70/15/15, seed 42: <b>1,766 train / 377 validation / 378 test</b> (trash 96/21/20), saved in <i>results/split.csv</i>. <b>Pre-processing:</b> resize to 224&times;224, ImageNet mean/std normalisation. <b>Augmentation (training only):</b> rotation &plusmn;20&deg;, random resized crop (60&ndash;100&nbsp;% area), horizontal/vertical flips, mild colour jitter. <b>Imbalance:</b> inverse-frequency class weights in the loss (trash 3.07, paper 0.71), checkpoint selection on validation macro-F1, and an ablation without the weights.</p>
+
+<h2>3. Methodology</h2>
+<p>Three CNNs were compared. <b>(A) WasteNet</b>, designed and trained from scratch: five stages of two 3&times;3 conv&ndash;BatchNorm&ndash;ReLU layers + 2&times;2 max-pool (32&rarr;384 channels, 224&rarr;7 px), global average pooling, dropout 0.4 and a linear layer (3.39&nbsp;M parameters). <b>(B) ResNet-50</b> (23.5&nbsp;M) and <b>(C) EfficientNet-B0</b> (4.0&nbsp;M), pre-trained on ImageNet: the 1000-way head was replaced by dropout 0.3 + linear(6), and <b>all layers were fine-tuned (none frozen)</b>, the new head with a 10&times; higher learning rate. Loss: class-weighted cross-entropy with label smoothing 0.1. Optimiser: AdamW, one-cycle schedule (15&nbsp;% warm-up, cosine decay), mixed precision on an RTX 4050 GPU. The weights with the best <i>validation</i> macro-F1 were kept, with early stopping on that metric (Table&nbsp;1).</p>
+<p class="cap"><b>Table 1.</b> Hyper-parameters (batch size 32 and input 224&times;224 for all models).</p>
+<table>
+  <tr><th class="l">Model</th><th>Initialisation</th><th>Peak LR (backbone / head)</th><th>Weight decay</th><th>Max epochs</th><th>Early-stop patience</th></tr>
+  <tr><td class="l">A. WasteNet</td><td>random</td><td>3e-3</td><td>0.05</td><td>60</td><td>15</td></tr>
+  <tr><td class="l">B. ResNet-50</td><td>ImageNet</td><td>2e-4 / 2e-3</td><td>0.01</td><td>25</td><td>10</td></tr>
+  <tr><td class="l">C. EfficientNet-B0</td><td>ImageNet</td><td>5e-4 / 3e-3</td><td>0.01</td><td>25</td><td>10</td></tr>
+</table>
+
+<h2>4. Results</h2>
+<p>All numbers are from the held-out <b>test set</b> (378 images, 20 trash). The model selected on <i>validation</i> macro-F1, <b>EfficientNet-B0</b>, reaches <b>accuracy 0.95 and macro-F1 0.95</b>, with trash recall 0.95 (19 of 20); per-class F1: glass 0.96, paper 0.96, cardboard 0.96, plastic 0.93, metal 0.95, trash 0.93. ResNet-50 scored slightly higher on test, but selection must use validation data and the CIs overlap.</p>
+<p class="cap"><b>Table 2.</b> Test-set results (95&nbsp;% bootstrap CI in brackets; CPU latency for one image on 4 threads).</p>
+<table>
+  <tr><th class="l">Model</th><th>Accuracy</th><th>Macro-F1 [95% CI]</th><th>Trash P</th><th>Trash R</th><th>Trash F1</th><th>CPU ms</th><th>Train min</th></tr>
+  <tr><td class="l">A. WasteNet (scratch)</td><td>0.82</td><td>0.80 [0.75, 0.84]</td><td>0.49</td><td>0.90</td><td>0.63</td><td>38.9</td><td>5.8</td></tr>
+  <tr><td class="l">B. ResNet-50</td><td>0.97</td><td>0.97 [0.94, 0.98]</td><td>0.95</td><td>0.95</td><td>0.95</td><td>45.8</td><td>3.6</td></tr>
+  <tr><td class="l"><b>C. EfficientNet-B0 (selected)</b></td><td><b>0.95</b></td><td><b>0.95 [0.92, 0.97]</b></td><td><b>0.90</b></td><td><b>0.95</b></td><td><b>0.93</b></td><td><b>18.5</b></td><td><b>3.0</b></td></tr>
+  <tr><td class="l">C, unweighted loss (ablation)</td><td>0.96</td><td>0.96 [0.93, 0.98]</td><td>0.95</td><td>0.95</td><td>0.95</td><td>18.5</td><td>2.7</td></tr>
+</table>
+<figure>
+  <img style="width:90%;margin:0 auto" src="../figures/report_fig1_curves_confusion.png" alt="Learning curves and test confusion matrix">
+  <figcaption><b>Fig. 1.</b> EfficientNet-B0: (a) training and validation loss and (b) accuracy per epoch, with the dot marking the kept epoch (16); (c) test confusion matrix (counts).</figcaption>
+</figure>
+
+<h2>5. Analysis and Discussion</h2>
+<p><b>Confusions (Fig.&nbsp;1c):</b> plastic is the hardest class (recall 0.89; 4&nbsp;&rarr;&nbsp;glass, 4&nbsp;&rarr;&nbsp;metal), then cardboard (0.92; 4&nbsp;&rarr;&nbsp;paper). These are material look-alikes: PET bottles share shape and gloss with glass (Fig.&nbsp;2c), lids resemble cans (Fig.&nbsp;2d), white paperboard looks like paper. <b>Trash errors:</b> one of 20 was missed, a printed tea sachet predicted as paper (Fig.&nbsp;2a). Trash is defined by recyclability rather than material, and in a t-SNE of the features this sachet lies inside the paper cluster. The 2 false trash alarms show a clear plastic bag that TrashNet labels <i>paper</i> (Fig.&nbsp;2b), i.e. label noise. Grad-CAM shows correct trash predictions focus on the wrapper, not the background. <b>Fitting:</b> pre-trained models reach about 1.00 training vs. 0.95 validation accuracy with a flat validation loss, i.e. mild over-fitting contained by augmentation, dropout, weight decay and best-epoch selection; the scratch CNN under-fits (0.79 vs. 0.76). <b>Imbalance (specific challenge):</b> without class weights, EfficientNet-B0 gave trash F1 0.95 vs. 0.93 (1 vs. 2 false alarms), but validation macro-F1 0.94 vs. 0.95. These 1&ndash;3-image differences lie inside the CIs, so for pre-trained features (which form a separate trash cluster) the weights have no measurable effect; for the scratch CNN they raised trash recall (0.90) at the cost of precision (0.49).</p>
+<figure>
+  <img style="width:92%;margin:0 auto" src="../figures/report_fig2_errors.png" alt="Misclassified test images">
+  <figcaption><b>Fig. 2.</b> Test errors of EfficientNet-B0 (true &rarr; predicted, confidence): (a) laminated tea sachet; (b) plastic bag labelled <i>paper</i> in TrashNet (label noise); (c) green PET bottle from above; (d) yoghurt-cup lid.</figcaption>
+</figure>
+
+<h2>6. Real-world Relevance, Limitations and Ethics</h2>
+<p>The model could run in a camera-equipped smart bin or a conveyor pre-sorter: EfficientNet-B0 needs 4.0&nbsp;M parameters (16&nbsp;MB) and 18.5&nbsp;ms per image on 4 CPU threads. It is not deployable yet: TrashNet shows one clean item on a white board, whereas real waste is dirty, cluttered and overlapping, and its US packaging may not represent Indian waste. Only 20 trash test images exist (trash-F1 CI 0.83&ndash;1.00). Since errors cost lost recyclables or contaminated bales, low-confidence items (wrong predictions average 0.59 confidence vs. 0.87 for correct ones) should go to manual sorting; bin cameras that may capture people should process images on the device without storing them.</p>
+
+<h2>7. Conclusion and Future Work</h2>
+<p>A fine-tuned EfficientNet-B0 sorts single waste items with <b>test macro-F1 0.95 and trash recall 0.95</b>, far above a CNN trained from scratch (macro-F1 0.80). Next, I would fine-tune it on photos taken inside a real bin (clutter, several items, dirt) and add a confidence-based reject option for uncertain items.</p>
+
+<div class="foot">
+  <b>Dataset:</b> G. Thung and M. Yang, &ldquo;Classification of Trash for Recyclability Status,&rdquo; CS229 Project Report, Stanford University, 2016. <b>AI-assistance declaration:</b> Claude (Anthropic) assisted with the code and wording; all numbers come from the executed notebook.
+</div>
+
+</body>
+</html>

@@ -1,0 +1,216 @@
+{
+  "final_model": "EfficientNet-B0",
+  "images_used": 2521,
+  "removed_label_conflicts": 6,
+  "split_sizes": {
+    "train": 1766,
+    "val": 377,
+    "test": 378
+  },
+  "test_metrics": {
+    "WasteNet": {
+      "accuracy": 0.8175,
+      "balanced_acc": 0.8291,
+      "macro_precision": 0.7957,
+      "macro_f1": 0.7994,
+      "weighted_f1": 0.8219,
+      "cohen_kappa": 0.7777,
+      "top2_acc": 0.9339,
+      "macro_roc_auc": 0.9752,
+      "trash_precision": 0.4865,
+      "trash_recall": 0.9,
+      "trash_f1": 0.6316
+    },
+    "ResNet-50": {
+      "accuracy": 0.9683,
+      "balanced_acc": 0.9658,
+      "macro_precision": 0.9667,
+      "macro_f1": 0.9657,
+      "weighted_f1": 0.9682,
+      "cohen_kappa": 0.961,
+      "top2_acc": 0.9841,
+      "macro_roc_auc": 0.9962,
+      "trash_precision": 0.95,
+      "trash_recall": 0.95,
+      "trash_f1": 0.95
+    },
+    "EfficientNet-B0": {
+      "accuracy": 0.9497,
+      "balanced_acc": 0.9489,
+      "macro_precision": 0.9467,
+      "macro_f1": 0.9466,
+      "weighted_f1": 0.9496,
+      "cohen_kappa": 0.9383,
+      "top2_acc": 0.9683,
+      "macro_roc_auc": 0.996,
+      "trash_precision": 0.9048,
+      "trash_recall": 0.95,
+      "trash_f1": 0.9268
+    },
+    "EfficientNet-B0 (unweighted loss)": {
+      "accuracy": 0.955,
+      "balanced_acc": 0.9547,
+      "macro_precision": 0.9559,
+      "macro_f1": 0.9545,
+      "weighted_f1": 0.9551,
+      "cohen_kappa": 0.9448,
+      "top2_acc": 0.9841,
+      "macro_roc_auc": 0.9959,
+      "trash_precision": 0.95,
+      "trash_recall": 0.95,
+      "trash_f1": 0.95
+    }
+  },
+  "confidence_intervals": {
+    "WasteNet": {
+      "accuracy 95% CI": "[0.778, 0.857]",
+      "macro-F1 95% CI": "[0.754, 0.843]",
+      "trash recall 95% CI": "[0.750, 1.000]",
+      "trash F1 95% CI": "[0.467, 0.767]"
+    },
+    "ResNet-50": {
+      "accuracy 95% CI": "[0.950, 0.984]",
+      "macro-F1 95% CI": "[0.943, 0.984]",
+      "trash recall 95% CI": "[0.833, 1.000]",
+      "trash F1 95% CI": "[0.864, 1.000]"
+    },
+    "EfficientNet-B0": {
+      "accuracy 95% CI": "[0.926, 0.971]",
+      "macro-F1 95% CI": "[0.920, 0.969]",
+      "trash recall 95% CI": "[0.833, 1.000]",
+      "trash F1 95% CI": "[0.826, 1.000]"
+    },
+    "EfficientNet-B0 (unweighted loss)": {
+      "accuracy 95% CI": "[0.931, 0.976]",
+      "macro-F1 95% CI": "[0.929, 0.976]",
+      "trash recall 95% CI": "[0.833, 1.000]",
+      "trash F1 95% CI": "[0.864, 1.000]"
+    }
+  },
+  "final_per_class": {
+    "glass": {
+      "precision": 0.9367,
+      "recall": 0.9867,
+      "F1": 0.961,
+      "support (test images)": 75
+    },
+    "paper": {
+      "precision": 0.9451,
+      "recall": 0.9663,
+      "F1": 0.9556,
+      "support (test images)": 89
+    },
+    "cardboard": {
+      "precision": 1.0,
+      "recall": 0.918,
+      "F1": 0.9573,
+      "support (test images)": 61
+    },
+    "plastic": {
+      "precision": 0.9846,
+      "recall": 0.8889,
+      "F1": 0.9343,
+      "support (test images)": 72
+    },
+    "metal": {
+      "precision": 0.9091,
+      "recall": 0.9836,
+      "F1": 0.9449,
+      "support (test images)": 61
+    },
+    "trash": {
+      "precision": 0.9048,
+      "recall": 0.95,
+      "F1": 0.9268,
+      "support (test images)": 20
+    },
+    "macro avg": {
+      "precision": 0.9467,
+      "recall": 0.9489,
+      "F1": 0.9466,
+      "support (test images)": 378
+    }
+  },
+  "final_confusion_matrix": [
+    [
+      74,
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    [
+      1,
+      86,
+      0,
+      0,
+      0,
+      2
+    ],
+    [
+      0,
+      4,
+      56,
+      0,
+      1,
+      0
+    ],
+    [
+      4,
+      0,
+      0,
+      64,
+      4,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      60,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      0,
+      0,
+      19
+    ]
+  ],
+  "deployment": {
+    "WasteNet": {
+      "parameters (M)": 3.3889,
+      "weights file (MB)": 13.5914,
+      "GPU latency (ms/img)": 1.4849,
+      "CPU latency, 4 threads (ms/img)": 38.9097,
+      "training time (min)": 5.797,
+      "test accuracy": 0.8175,
+      "test macro-F1": 0.7994,
+      "test trash F1": 0.6316
+    },
+    "ResNet-50": {
+      "parameters (M)": 23.5203,
+      "weights file (MB)": 94.4001,
+      "GPU latency (ms/img)": 3.1618,
+      "CPU latency, 4 threads (ms/img)": 45.7974,
+      "training time (min)": 3.6255,
+      "test accuracy": 0.9683,
+      "test macro-F1": 0.9657,
+      "test trash F1": 0.95
+    },
+    "EfficientNet-B0": {
+      "parameters (M)": 4.0152,
+      "weights file (MB)": 16.3623,
+      "GPU latency (ms/img)": 6.429,
+      "CPU latency, 4 threads (ms/img)": 18.5155,
+      "training time (min)": 2.9673,
+      "test accuracy": 0.9497,
+      "test macro-F1": 0.9466,
+      "test trash F1": 0.9268
+    }
+  }
+}
